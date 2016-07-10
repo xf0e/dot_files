@@ -93,7 +93,8 @@ export color_WB=$(tput sgr0; tput setab 7)  # White
 ### Prompt ###
 ##############
 
-export PS1="\[$(tput bold)\]\[$(tput setaf 1)\]\342\224\214\342\224\200[\$(smiley)][\[$(tput setaf 3)\]\u\[$(tput setaf 2)\]@\[$(tput setaf 4)\]\h \[$(tput setaf 5)\]\\W \[$(tput setaf 3)\]- $(/bin/ls -1 | /usr/bin/wc -l | /bin/sed 's: ::g') files, $(/bin/ls -lah `pwd`| /usr/bin/head -n 1)b\[$(tput setaf 1)\]]\[$(tput setaf 7)\]\n\[$(tput setaf 1)\]\342\224\224\342\224\200\342\224\200\342\224\200\342\225\274 \[$(tput sgr0)\]"
+#export PS1="\[$(tput bold)\]\[$(tput setaf 1)\]\342\224\214\342\224\200[\$(smiley)][\[$(tput setaf 3)\]\u\[$(tput setaf 2)\]@\[$(tput setaf 4)\]\h \[$(tput setaf 5)\]\\W \[$(tput setaf 3)\]- $(/bin/ls -1 | /usr/bin/wc -l | /bin/sed 's: ::g') files, $(/bin/ls -lah `pwd`| /usr/bin/head -n 1)b\[$(tput setaf 1)\]]\[$(tput setaf 7)\]\n\[$(tput setaf 1)\]\342\224\224\342\224\200\342\224\200\342\224\200\342\225\274 \[$(tput sgr0)\]"
+export PS1="\n\[\$color_g\](\[\$color_y\]\u\[\$color_w\]@\H\[\$color_g\])-(\[\$color_w\]$(/bin/ls -1 | /usr/bin/wc -l | /bin/sed 's: ::g') files, $(/bin/ls -lah `pwd`| /usr/bin/head -n 1)b\[\$color_g\])-(\[\$color_w\]\w\[\$color_g\])\n(\[\[\$color_w\]\$(smiley)\[\$color_g\])\$ \[\e[0m\]"
 
 #########################
 ### Aliases/Functions ###
@@ -497,8 +498,8 @@ smiley() {
   err=$?
   if [ -z $STY ]; then
       if [ $err == 0 ]
-        then echo "✓" && aplay ~/.bell.wav > /dev/null 2>&1
-        else echo "☠ $err" && aplay ~/.error.wav > /dev/null  2>&1
+        then echo "✓" & aplay ~/.bell.wav > /dev/null 2>&1
+        else echo "☠ $err" & aplay ~/.error.wav > /dev/null  2>&1
       fi
   else
       if [ $err == 0 ]
