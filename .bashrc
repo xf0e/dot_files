@@ -93,13 +93,7 @@ export color_WB=$(tput sgr0; tput setab 7)  # White
 ### Prompt ###
 ##############
 
-if [[ $UID -ne 0 ]]; then
-    export PS1="\[$(tput bold)\]\[$(tput setaf 1)\]\342\224\214\342\224\200[\$(smiley)][\[$(tput setaf 3)\]\u\[$(tput setaf 2)\]@\[$(tput setaf 4)\]\h \[$(tput setaf 5)\]\W\[$(tput setaf 1)\]]\[$(tput setaf 7)\]\n\[$(tput setaf 1)\]\342\224\224\342\224\200\342\224\200\342\224\200\342\225\274 \[$(tput sgr0)\]"
-       # export PS1="\[$(tput bold)\]\[$(tput setaf 1)\][\$(smiley)][\[$(tput setaf 3)\]\u\[$(tput setaf 2)\]@\[$(tput setaf 4)\]\h \[$(tput setaf 5)\]\W\[$(tput setaf 1)\]]\[$(tput setaf 7)\]\\$ \[$(tput sgr0)\]"
-    else
-            export PS1="\[$color_C\]***\$(smiley)***\[$color_C\]\[$color_R\]\u\[$color_C\]@\H:\[$color_R\]\w\[$color_C\] $(/bin/ls -1 | /usr/bin/wc -l | /bin/sed 's: ::g') files, $(/bin/ls -lah `pwd`| /usr/bin/head -n 1)b\n$ \[$color_N\]"
-
-fi
+export PS1="\[$(tput bold)\]\[$(tput setaf 1)\]\342\224\214\342\224\200[\$(smiley)][\[$(tput setaf 3)\]\u\[$(tput setaf 2)\]@\[$(tput setaf 4)\]\h \[$(tput setaf 5)\]\\W \[$(tput setaf 3)\]- $(/bin/ls -1 | /usr/bin/wc -l | /bin/sed 's: ::g') files, $(/bin/ls -lah `pwd`| /usr/bin/head -n 1)b\[$(tput setaf 1)\]]\[$(tput setaf 7)\]\n\[$(tput setaf 1)\]\342\224\224\342\224\200\342\224\200\342\224\200\342\225\274 \[$(tput sgr0)\]"
 
 #########################
 ### Aliases/Functions ###
@@ -501,16 +495,15 @@ mkcd() {
 # i use this function in PS1 to represent if the command that was running before exited with 0 code
 smiley() {
   err=$?
-  if [ "$UID" == 0 ]; then
-      user=root;
+  if [ -z $STY ]; then
       if [ $err == 0 ]
-      then echo "$user★"
-      else echo "$userᣰ $err  "
+        then echo "✓" && aplay ~/.bell.wav > /dev/null 2>&1
+        else echo "☠ $err" && aplay ~/.error.wav > /dev/null  2>&1
       fi
   else
       if [ $err == 0 ]
-      then echo "✓" && aplay ~/.bell.wav > /dev/null 2>&1
-      else echo "☠ $err" && aplay ~/.error.wav > /dev/null  2>&1
+        then echo "✓ [scr]"
+        else echo "☠ [scr] $err  "
       fi
   fi
 }
