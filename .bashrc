@@ -154,6 +154,8 @@ alias hist='history | grep $1'
 alias openports='netstat --all --numeric --programs --inet'
 alias releasemouse='xdotool mouseup 3'
 alias dirf='find . -type d | sed -e "s/[^-][^\/]*\//  |/g" -e "s/|\([^ ]\)/|-\1/"'
+alias mktempdir='tdir=`mktemp -d` && cd $tdir'
+alias path='echo -e ${PATH//:/\\n}'
 
 #########################
 ###System maintenance ###
@@ -263,7 +265,7 @@ screenshot() {
 
 genpass()
 {
-    cat /dev/urandom | tr -d -c 'a-zA-Z0-9' | fold -w 8 | head -1
+    cat /dev/urandom | tr -d -c 'a-zA-Z0-9!' | fold -w 15 | head -1
 }
 
 p_cpu() {
@@ -472,7 +474,7 @@ function ii()   # Дополнительные сведения о систем�
     echo
 }
 function up {
-    [ "${1/[^0-9]/}" == "$1" ] && {
+    [[ $1 =~ "${1/[^0-9]/}" ]] && {
         local ups=""
             for i in $(seq 1 $1)
                         do
@@ -481,11 +483,10 @@ function up {
                     cd $ups
                     } || echo "usage: up INTEGER"
             }
-alias mktempdir='tdir=`mktemp -d` && cd $tdir'
 
 # list contents right after changing directories
 cd() {
-  if [ "$1" ]
+  if [[ $1 ]]
   then builtin cd "$1" && ls
   else builtin cd && ls
   fi
@@ -512,9 +513,6 @@ smiley() {
       fi
   fi
 }
-
-#small functions
-alias path='echo -e ${PATH//:/\\n}'
 
 
 function kll () {
@@ -711,14 +709,6 @@ IFS=$'\n'
 unset IFS
 }
 
-
-#downloas from deposit
-down_deposit(){
-    wget -O- -q --post-data 'gateway_result=1' "http://depositfiles.com/ru/files/$(basename ${1})" |
-    sed -n -r -e 's/.*<form action=\"([a-z0-9A-Z\/\.:_\-]+)\" method=\"get\" onSubmit=\"download_started.*/wget -c \"\1\"/gp; s/\t+([0-9]{1,3}) минут\(ы\)\./echo Спим \1 минут/gp' | sh
-}
-
-
 showmenu(){
     for v in "$@"; do
         echo "$v"
@@ -820,14 +810,6 @@ function wrap(){
     fi
   fi
 return $EXIT_CODE
-}
-
-
-function cp_p(){
-    if [ `echo "$2" | grep ".*\/$"` ];
-        then pv "$1" > "$2""$1";
-        else pv "$1" > "$2"/"$1";
-    fi;
 }
 
 
