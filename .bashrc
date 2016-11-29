@@ -42,6 +42,8 @@ shopt -s no_empty_cmd_completion
 shopt -s nocaseglob
 shopt -s checkwinsize
 shopt -s cdspell
+# avoid duplicates..
+export HISTCONTROL=ignoredups:erasedups  
 shopt -s histappend
 shopt -s dotglob
 shopt -s globstar
@@ -108,7 +110,8 @@ export PS1="\n\[\$color_g\](\[\$color_y\]\u@\[\$ssh_color\]\H\[\$color_g\]\[\$ss
 alias mc='mc -S modarin256'
 alias less=${PAGER}
 alias zless=${PAGER}
-alias ls='ls --color=auto'
+alias ls='ls++ --potsf'
+#alias ls='ls --color=auto'
 alias grep='grep --color=auto'
 alias dir='ls --color=auto --format=vertical'
 alias vdir='ls --color=auto --format=long'
@@ -503,8 +506,8 @@ smiley() {
   err=$?
   if [ -z $STY ]; then
       if [ $err == 0 ]
-        then echo "✓" & aplay ~/.bell.wav > /dev/null 2>&1
-        else echo "☠ $err" & aplay ~/.error.wav > /dev/null  2>&1
+        then echo "✓" & aplay ~/.bell.wav > /dev/null 2>&1 &
+        else echo "☠ $err" & aplay ~/.error.wav > /dev/null  2>&1 &
       fi
   else
       if [ $err == 0 ]
@@ -625,7 +628,6 @@ function backup(){
 /var/lock/*
 EOF
 )
-        local TAR_OPTIONS="-cpP - --ignore-failed-read -f"
         echo -e "We will create a backup of $tobackup and store it in $backupdir"
         echo -e "We will EXCLUDE this from backup"
         echo -e "${base}"
@@ -643,9 +645,7 @@ EOF
         local excludefile=/tmp/exclude.stage4
         local backupname=$( date +"%d_%m_%y"".stage4.tar.bz2" )
         if [ -f "$excludefile" ]; then
-            tar "$TAR_OPTIONS" - -C "$tobackup" -X "$excludefile" \
-            | pv -s $(du -sb "$tobackup" | awk '{print $1}' | head -n1) \
-            | bzip2 -z -4 > "$backupdir""$backupname"
+            tar cpPf -C  $tobackup -X $excludefile | pv -s $(du -sb "$tobackup" | awk '{print $1}' | head -n1) | bzip2 -z -4 > "$backupdir""$backupname"
             echo -e "All pending operations completed."
         else
             echo -e "Exclude file can not be oppened. Do you have rights to write in /tmp?. Aborting"
@@ -877,9 +877,9 @@ function watchtube(){
 }
 
 function saveflash(){
-PID=`ps x | grep libflashplayer.so | grep -v grep | awk '{print $1}'`
-FD=`lsof -p $PID | grep Flash | awk '{print $4}' | sed 's/u^//'`
-cp /proc/$PID/fd/$FD $HOME/vid/"$1"
+    PID=`ps x | grep libflashplayer.so | grep -v grep | awk '{print $1}'`
+    FD=`lsof -p $PID | grep Flash | awk '{print $4}' | sed 's/u^//'`
+    cp /proc/$PID/fd/$FD $HOME/vid/"$1"
 }
 
 ###greetz
