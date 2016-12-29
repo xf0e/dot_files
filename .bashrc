@@ -215,6 +215,7 @@ extract () {
             *.zip)       unzip $1     ;;
             *.Z)         uncompress $1  ;;
             *.7z)        7z x $1    ;;
+	    *.rpm)       rpm2cpio $1 | cpio -idmv ;;
             *)           echo "'$1' cannot be extracted via extract()" ;;
         esac
     else
