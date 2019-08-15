@@ -1,4 +1,4 @@
-umask 077
+
 #export LIBVA_DRIVER_NAME=vdpau
 ############################
 ### NON INTERACTIVE MODE ###
@@ -12,7 +12,7 @@ fi
 [[ -f /etc/bash_completion ]] && . /etc/bash_completion
 
 if [ -f ~/.dircolors ]; then
-           eval `dircolors ~/.dircolors`
+    eval "$(dircolors ~/.dircolors)"
 fi
 
 #############################
@@ -26,8 +26,12 @@ export HISTIGNORE="&:ls:[bf]g:exit:bash:[cxh]:a\ "
 export HISTCONTROL=ignoreboth
 export BROWSER=firefox
 export MANPAGER=vimpager
-export LESS='-i -N -w  -z-4 -g -e -M -X -F -R -P%t?f%f \'
+export LESS='-i -N -w  -z-4 -g -e -M -X -F -R -P%t?f%f \ '
 export PAGER=/usr/bin/vimpager
+
+###### shocrcuts for search(page{up,down}) #######
+#"\e[5~": history-search-backward
+#"\e[6~": history-search-forward
 
 #####################
 ### Shell Options ###
@@ -50,7 +54,6 @@ shopt -s globstar
 shopt -s dirspell
 
 [ -x /usr/bin/lesspipe ] && eval "$(lesspipe)"
-LOCALHOST='cassiopeia'
 
 ### INTERACTIVE MODE ###
 
@@ -99,7 +102,8 @@ if [[ -v SSH_CLIENT ]]; then
         export ssh_color=$color_RB
         export ssh_normal=$color_LB
 fi
-export PS1="\n\[\$color_g\](\[\$color_y\]\u@\[\$ssh_color\]\H\[\$color_g\]\[\$ssh_normal\])-(\[\$color_w\]$(/bin/ls -1 | /usr/bin/wc -l | /bin/sed 's: ::g') files, $(/bin/ls -lah `pwd`| /usr/bin/head -n 1)b\[\$color_g\])-(\[\$color_w\]\w\[\$color_g\])\n(\[\[\$color_w\]\$(smiley)\[\$color_g\])\$ \[\e[0m\]"
+
+export PS1="\n\[\$color_g\](\[\$color_y\]\u@\[\$ssh_color\]\H\[\$color_g\]\[\$ssh_normal\])-(\[\$color_w\]$(/bin/ls -1 | /usr/bin/wc -l | /bin/sed 's: ::g') files, $(/bin/ls -lah "$(pwd)" | /usr/bin/head -n 1)b\[\$color_g\])-(\[\$color_w\]\w\[\$color_g\])\n(\[\[\$color_w\]\$(smiley)\[\$color_g\])\$ \[\e[0m\]"
 
 
 #########################
@@ -110,8 +114,7 @@ export PS1="\n\[\$color_g\](\[\$color_y\]\u@\[\$ssh_color\]\H\[\$color_g\]\[\$ss
 alias mc='mc -S modarin256'
 alias less=${PAGER}
 alias zless=${PAGER}
-alias ls='ls++ --potsf'
-#alias ls='ls --color=auto'
+alias ls='ls --color=auto'
 alias grep='grep --color=auto'
 alias dir='ls --color=auto --format=vertical'
 alias vdir='ls --color=auto --format=long'
@@ -125,8 +128,8 @@ alias ping='ping -c 5'
 #alias aptbuild-dep='sudo apt-get build-dep'
 #alias aptsearch='aptitude search'
 alias build='makepkg -fis'
-alias upgrade='yaourt -Syu --aur'
-alias update='yaourt -Sy'
+alias upgrade='aurman -Syu'
+alias update='aurman -Syi --color'
 # проверка правописания - настоятельно рекомендую :-)
 alias xs='cd'
 alias vf='cd'
@@ -134,7 +137,6 @@ alias moer='more'
 alias moew='more'
 alias kk='ll'
 alias back='cd $OLDPWD'
-alias music='mplayer -cache-min 0 $**.{mp3,flac,ogg}'
 alias cd..='cd ..'
 alias du='du -h -c'
 alias mkdir='mkdir -p -v'
@@ -164,21 +166,11 @@ alias path='echo -e ${PATH//:/\\n}'
 ###System maintenance ###
 #########################
 
-function getWeather(){
-    if [ $# = 0 ] ; then
-        city="Halle(Saale), DE"
-    else
-        city=$1
-    fi
-    curl -s "http://api.openweathermap.org/data/2.5/forecast/daily?q=$city&units=metric&cnt=2" | \
-        sed -e 's/[{}]/''/g' | awk -v k="text" '{n=split($0,a,","); for (i=1; i<=n; i++) print a[i]}' | grep 'main\|temp' |sed -e 's/[""]/''/g' | sed -e 's/main/''/g'
-}
-
 
 function cleanDependencies(){
   for i in $(pacman -Qdt | awk '{print $1}');
-	do  echo $i ;
-	sudo pacman -R $i;
+	do  echo "$i" ;
+	sudo pacman -R "$i";
   done;
 }
 
@@ -202,19 +194,19 @@ iterate () {
 }
 
 extract () {
-    if [ -f $1 ] ; then
+    if [ -f "$1" ] ; then
         case $1 in
-            *.tar.bz2)   tar xjf $1        ;;
-            *.tar.gz)    tar xzf $1     ;;
-            *.bz2)       bunzip2 $1       ;;
-            *.rar)       rar x $1     ;;
-            *.gz)        gunzip $1     ;;
-            *.tar)       tar xf $1        ;;
-            *.tbz2)      tar xjf $1      ;;
-            *.tgz)       tar xzf $1       ;;
-            *.zip)       unzip $1     ;;
-            *.Z)         uncompress $1  ;;
-            *.7z)        7z x $1    ;;
+            *.tar.bz2)   tar xjf "$1"        ;;
+            *.tar.gz)    tar xzf "$1"     ;;
+            *.bz2)       bunzip2 "$1"       ;;
+            *.rar)       rar x "$1"     ;;
+            *.gz)        gunzip "$1"     ;;
+            *.tar)       tar xf "$1"        ;;
+            *.tbz2)      tar xjf "$1"      ;;
+            *.tgz)       tar xzf "$1"       ;;
+            *.zip)       unzip "$1"     ;;
+            *.Z)         uncompress "$1"  ;;
+            *.7z)        7z x "$1"    ;;
             *)           echo "'$1' cannot be extracted via extract()" ;;
         esac
     else
@@ -387,7 +379,7 @@ function my_ps () {
         echo "Shows all the process of the current user. Usage ${RED_FG}'my_ps'$NC or ${RED_FG}'my_ps process1 process2...'$NC"
         return
     fi
-    ps $@ -u $USER -o stat,pid,%cpu,%mem,bsdtime,command ;
+    ps "$@" -u "$USER" -o stat,pid,%cpu,%mem,bsdtime,command ;
 }
 
 usage() {
@@ -477,9 +469,9 @@ function ii()   # Дополнительные сведения о систем�
     echo
 }
 function up {
-    [[ $1 =~ "${1/[^0-9]/}" ]] && {
+    [[ $1 =~ ${1/[^0-9]/} ]] && {
         local ups=""
-            for i in $(seq 1 $1)
+            for i in $(seq 1 "$1")
                         do
                             ups=$ups"../"
                         done
@@ -504,7 +496,7 @@ mkcd() {
 # i use this function in PS1 to represent if the command that was running before exited with 0 code
 smiley() {
   err=$?
-  if [ -z $STY ]; then
+  if [ -z "$STY" ]; then
       if [ $err == 0 ]
         then echo "✓" & aplay ~/.bell.wav > /dev/null 2>&1 &
         else echo "☠ $err" & aplay ~/.error.wav > /dev/null  2>&1 &
@@ -530,7 +522,7 @@ function kll () {
     fi
 
 
-    local PROCS=`ps -u $USER -o %cpu,pid | tr -d '%CPU' | tr -d 'ID' | tr -d '.'`
+    local PROCS=$(ps -u "$USER" -o %cpu,pid | tr -d '%CPU' | tr -d 'ID' | tr -d '.')
 
     local LOAD_TARGET=`expr $1 \* 10`
     local FLAG=0
@@ -797,16 +789,16 @@ function radioplay(){
 
 ##plays quad_dmg sound from quake to report the end of an operation###
 function wrap(){
-  SUCCESS_SOUND=/home/`whoami`/.quad.wav
+    SUCCESS_SOUND=/home/$(whoami)/.quad.wav
   if [ $# -gt 0 ]; then
     "$@"
       EXIT_CODE=$?
     if [ $EXIT_CODE -eq 0 ]; then
        #notify-send -i gtk-apply "$*" "successed" &&
-       aplay -q $SUCCESS_SOUND
+       aplay -q "$SUCCESS_SOUND"
     else
        #notify-send -i gtk-dialog-error "$*" "failed" &&
-       aplay -q $SUCCESS_SOUND
+       aplay -q "$SUCCESS_SOUND"
     fi
   fi
 return $EXIT_CODE
@@ -815,7 +807,7 @@ return $EXIT_CODE
 
 function 4chanimages()
 {
-    curl $1 | grep -i "File<a href" | awk -F '<a href="' '{print $4}' | awk -F '" ' '{print $1}' | xargs wget
+    curl "$1" | grep -i "File<a href" | awk -F '<a href="' '{print $4}' | awk -F '" ' '{print $1}' | xargs wget
 }
 
 ## complete section
@@ -859,7 +851,7 @@ EOF
 
 
 function timer(){
-date1=`date +%s`; while true; do     echo -ne "$(date -u --date @$((`date +%s` - $date1)) +%H:%M:%S)\r"; done
+    date1=$(date +%s); while true; do     echo -ne "$(date -u --date @$(($(date +%s) - "$date1")) +%H:%M:%S)\r"; done
 }
 
 function watchtube(){
@@ -871,14 +863,14 @@ function watchtube(){
                 exit
         fi
 
-        echo \"http://www.youtube.com/get_video?video_id=$(wget -q -0 - "$URL"
-                           | sed -e '/fullscreenUrl/!d'                          -e "s/.*video_id=\([^']*\).*/\1/"                             -e 's/ /_/g'
-                             -e 's/\\\"/"/g'                            )\"                              | xargs mplayer "$@"
+        echo \"http://www.youtube.com/get_video?video_id=$(wget -q -0 - "$URL" \
+                           | sed -e '/fullscreenUrl/!d' -e "s/.*video_id=\([^']*\).*/\1/" -e 's/ /_/g' \
+                             -e 's/\\\"/"/g')\" | xargs mplayer "$@"
 }
 
 function saveflash(){
-    PID=`ps x | grep libflashplayer.so | grep -v grep | awk '{print $1}'`
-    FD=`lsof -p $PID | grep Flash | awk '{print $4}' | sed 's/u^//'`
+    PID=$(ps x | grep libflashplayer.so | grep -v grep | awk '{print $1}')
+    FD=$(lsof -p $PID | grep Flash | awk '{print $4}' | sed 's/u^//')
     cp /proc/$PID/fd/$FD $HOME/vid/"$1"
 }
 
